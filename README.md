@@ -1,5 +1,8 @@
 # Fiscalapi Credentials
 
+[![NuGet](https://img.shields.io/nuget/v/FiscalApi.svg)](https://www.nuget.org/packages/Fiscalapi.Credentials/)
+[![License](https://img.shields.io/github/license/FiscalAPI/fiscalapi-credentials-net)](https://github.com/FiscalAPI/fiscalapi-credentials-net/blob/main/LICENSE)
+
 Biblioteca para trabajar con archivos **CSD** y **FIEL** del SAT de manera sencilla en .NET. **`Credentials`** simplifica la firma (sellado), la verificación de firmas, el cálculo de hashes (por ejemplo, para servicios de descarga masiva de XML y metadatos), así como la obtención de información relevante de los certificados y llaves públicas del SAT.  
 
 La firma digital es un proceso criptográfico que garantiza la autenticidad, integridad y no repudio de un documento o mensaje. En México, el SAT requiere que los contribuyentes utilicen un **Certificado de Sello Digital (CSD)** para firmar (sellar) las facturas, mientras que una **Firma Electrónica Avanzada (FIEL)** se utiliza para firmar documentos de cualquier otro tipo (contratos, acuerdos, cotizaciones, correos, etc) de manera legalmente válida.
