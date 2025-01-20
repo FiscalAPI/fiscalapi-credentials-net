@@ -49,12 +49,17 @@ La firma digital es un proceso criptográfico que garantiza la autenticidad, int
 
 ## 📦Instalación
 
-Instala el paquete [**Credentials**](https://www.nuget.org/packages/Credentials/) desde **NuGet**:
+**NuGet Package Manager**:
 
 ```bash
-Install-Package Credentials -Version 4.0.95
+NuGet\Install-Package Fiscalapi.Credentials
 ```
 
+**.NET CLI**:
+
+```bash
+dotnet add package Fiscalapi.Credentials
+```
 
 ## Ejemplos de uso
 
