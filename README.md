@@ -193,69 +193,35 @@ Las contribuciones son bienvenidas. Si deseas agregar nuevas funcionalidades, co
 2. Leer nuestro archivo de [CONTRIBUTING](CONTRIBUTING.md) para seguir las pautas del proyecto.  
 3. Consultar el archivo [TODO](TODO.md) y [CHANGELOG](CHANGELOG.md) si están disponibles para conocer pendientes o cambios recientes.
 
----
 
 ## 🤝 Contribuir
 
-1. Haz un **fork** del repositorio.  
-2. Crea una rama para tu feature:  
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```  
-3. Realiza *commits* de tus cambios:  
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```  
-4. Sube tu rama:  
-   ```bash
-   git push origin feature/AmazingFeature
-   ```  
-5. Abre un **Pull Request** en GitHub.
+1. Haz un fork del repositorio.  
+2. Crea una rama para tu feature: `git checkout -b feature/AmazingFeature`.  
+3. Realiza commits de tus cambios: `git commit -m 'Add some AmazingFeature'`.  
+4. Sube tu rama: `git push origin feature/AmazingFeature`.  
+5. Abre un Pull Request en GitHub.
 
----
 
 ## 🐛 Reportar Problemas
 
 1. Asegúrate de usar la última versión del SDK.  
-2. Verifica si el problema ya fue reportado en la sección de [Issues](https://github.com/FiscalAPI/fiscalapi-credentials-net/issues).  
-3. Proporciona un ejemplo mínimo reproducible que ayude a ubicar el error fácilmente.  
-4. Incluye todos los mensajes de error relevantes o capturas de pantalla.
+2. Verifica si el problema ya fue reportado.  
+3. Proporciona un ejemplo mínimo reproducible.  
+4. Incluye los mensajes de error completos.
 
----
 
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la **Licencia MPL**. Consulta el archivo [LICENSE](LICENSE.txt) para más detalles.
+Este proyecto está licenciado bajo la Licencia **MPL**. Consulta el archivo [LICENSE](LICENSE.txt) para más detalles.
 
----
 
 ## 🔗 Enlaces Útiles
 
-- [SDK .NET (fiscalapi-net)](https://github.com/FiscalAPI/fiscalapi-net)  
 - [Documentación Oficial](https://docs.fiscalapi.com)  
 - [Portal de FiscalAPI](https://fiscalapi.com)  
 - [Ejemplos WinForms/Console](https://github.com/FiscalAPI/fiscalapi-samples-net-winforms)  
 - [Ejemplos ASP.NET](https://github.com/FiscalAPI/fiscalapi-samples-net-aspnet)
-
----
-
-¡Gracias por usar **`Credentials`**! Siéntete libre de abrir un *issue* o un *pull request* en caso de dudas o sugerencias.  
-Equipo de **Fiscalapi**.  
-
-
-
-
-
-
-
-
-
-
-## 💡 Soporte
-
-- Correo: soporte@fiscalapi.com
-- [Documentación](https://docs.fiscalapi.com)
-- [GitHub Issues](https://github.com/FiscalAPI/fiscalapi-credentials-net/issues)
 
 ---
 
