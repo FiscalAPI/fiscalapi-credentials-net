@@ -1,25 +1,20 @@
-> **Nota:** La documentación se encuentra en español porque es el lenguaje principal de la mayoría de los usuarios.  
-> *The documentation of this project is in Spanish as it is the main language for the intended audience.*
-
----
-
 # Fiscalapi Credentials
 
+[![NuGet](https://img.shields.io/nuget/v/FiscalApi.svg)](https://www.nuget.org/packages/Fiscalapi.Credentials/)
+[![License](https://img.shields.io/github/license/FiscalAPI/fiscalapi-credentials-net)](https://github.com/FiscalAPI/fiscalapi-credentials-net/blob/main/LICENSE)
 
-Lib para trabajar con archivos **CSD** y **FIEL** del SAT de manera sencilla en .NET. **`Credentials`** simplifica la firma (sellado), la verificación de firmas, el cálculo de hashes (por ejemplo, para servicios de descarga masiva de XML y metadatos), así como la obtención de información relevante de los certificados y llaves públicas del SAT.
+Biblioteca para trabajar con archivos **CSD** y **FIEL** del SAT de manera sencilla en .NET. **`Credentials`** simplifica la firma (sellado), la verificación de firmas, el cálculo de hashes (por ejemplo, para servicios de descarga masiva de XML y metadatos), así como la obtención de información relevante de los certificados y llaves públicas del SAT.  
 
-> :bulb: **Tip:** La firma digital es un proceso criptográfico que garantiza la autenticidad, integridad y no repudio de un documento o mensaje. En México, el SAT requiere que los contribuyentes utilicen un **Certificado de Sello Digital (CSD)** para firmar (sellar) las facturas, mientras que una **Firma Electrónica Avanzada (FIEL)** se utiliza para firmar documentos de cualquier otro tipo (contratos, acuerdos, cotizaciones, correos, etc) de manera legalmente válida.
-
----
+La firma digital es un proceso criptográfico que garantiza la autenticidad, integridad y no repudio de un documento o mensaje. En México, el SAT requiere que los contribuyentes utilicen un **Certificado de Sello Digital (CSD)** para firmar (sellar) las facturas, mientras que una **Firma Electrónica Avanzada (FIEL)** se utiliza para firmar documentos de cualquier otro tipo (contratos, acuerdos, cotizaciones, correos, etc) de manera legalmente válida.
 
 ## Tabla de Contenido
 
-1. [Acerca de la Librería](#acerca-de-la-librería)  
-2. [Instalación](#instalación)  
+1. [Acerca de la Librería](#Características)  
+2. [Instalación](#Instalación)  
 3. [Uso Básico](#uso-básico)  
-   - [Certificado (`Certificate`)](#uso-básico-del-certificado)  
-   - [Clave Privada (`PrivateKey`)](#uso-básico-de-la-clave-privada)  
-   - [Credencial (`Credential`)](#uso-básico-del-objeto-credential)  
+   - [Certificado (`Certificate`)](#uso-del-certificado)  
+   - [Clave Privada (`PrivateKey`)](#uso-de-la-clave-privada)  
+   - [Credencial (`Credential`)](#uso-del-objeto-credential)  
 4. [Acerca de los Archivos CSD y FIEL](#acerca-de-los-archivos-de-certificado-y-llave-privada)  
 5. [Compatibilidad](#compatibilidad)  
 6. [Roadmap](#roadmap)  
@@ -29,11 +24,8 @@ Lib para trabajar con archivos **CSD** y **FIEL** del SAT de manera sencilla en 
 10. [📄 Licencia](#-licencia)  
 11. [🔗 Enlaces Útiles](#-enlaces-útiles)  
 
----
 
-## Acerca de la Librería
-
-Con **`Credentials`** puedes:
+## 🚀 Características
 
 - **Firmar (sellar) documentos**: Utilizar CSD o FIEL para generar firmas digitales que cumplen con los lineamientos del SAT.  
 - **Verificar firmas**: Validar que la firma fue generada correctamente con la llave privada asociada.  
@@ -58,23 +50,23 @@ Con **`Credentials`** puedes:
    - Permite firmar, validar firmas, crear archivos PFX, etc.  
    - Identifica si es CSD o FIEL y verifica su vigencia.  
 
----
+## 📦Instalación
 
-## Instalación
-
-Instala el paquete [**Credentials**](https://www.nuget.org/packages/Credentials/) desde **NuGet**:
+**NuGet Package Manager**:
 
 ```bash
-Install-Package Credentials -Version 4.0.95
+NuGet\Install-Package Fiscalapi.Credentials
 ```
 
----
+**.NET CLI**:
 
-## Uso Básico
+```bash
+dotnet add package Fiscalapi.Credentials
+```
 
-A continuación se muestran ejemplos simples de cómo utilizar las clases principales de la librería. 
+## Ejemplos de uso
 
-### Uso Básico del Certificado
+### Uso del Certificado
 
 ```csharp
 // Cargar el archivo .cer
@@ -102,7 +94,7 @@ var pemCertificate = certificate.GetPemRepresentation();
 File.WriteAllText("MyPemCertificate.pem", pemCertificate);
 ```
 
-### Uso Básico de la Clave Privada
+### Uso de la Clave Privada
 
 ```csharp
 // Cargar el archivo .key
@@ -118,7 +110,7 @@ var PemPrivateKey = privateKey.GetPemRepresentation();
 File.WriteAllText("MyPemPrivateKey.pem", PemPrivateKey);
 ```
 
-### Uso Básico del Objeto Credential
+### Uso del Objeto Credential
 
 ```csharp
 // Crear instancia de Credential a partir de certificate y privateKey
@@ -149,7 +141,6 @@ Console.WriteLine($"Tipo de Credencial: {cred.CredentialType}");  // Enum: Fiel 
 Console.WriteLine($"¿Es FIEL válida?: {cred.IsValidFiel()}");
 ```
 
----
 
 ## Acerca de los Archivos de Certificado y Llave Privada
 
@@ -163,16 +154,12 @@ Esta conversión consiste básicamente en:
 
 Por lo tanto, no necesitas realizar la conversión manual ni depender de utilerías externas para utilizar tus archivos **CSD** o **FIEL**.
 
----
 
 ## Compatibilidad
 
-- Compatible con **.NET 6**, **.NET 8** y versiones posteriores (incluyendo WinForms, aplicaciones de consola y web).  
+- Compatible con **.NET 6**, **.NET 8** y **.NET 9**  WinForms, WPF, Console, ASP.NET, Blazor, MVC, WebApi.   
 - Mantenemos la compatibilidad con al menos la versión LTS más reciente de .NET.  
-- Se sigue el [**Versionado Semántico 2.0.0**](docs/SEMVER.md), por lo que puedes confiar en que las versiones nuevas no romperán tu aplicación de forma inesperada.
-
----
-
+- Se sigue el [**Versionado Semántico 2.0.0**]([docs/SEMVER.md](https://learn.microsoft.com/en-us/nuget/concepts/package-versioning?tabs=semver20sort)), por lo que puedes confiar en que las versiones nuevas no romperán tu aplicación de forma inesperada.
 ## Roadmap
 
 - [x] Conversión de **X.509 DER** a **X.509 PEM** (SAT .cer).  
@@ -183,79 +170,35 @@ Por lo tanto, no necesitas realizar la conversión manual ni depender de utiler�
 - [x] Cálculo y verificación de hash para servicios SAT de descarga masiva de XML.  
 - [ ] Persistencia de CSD y FIEL utilizando Entity Framework Core y bases de datos relacionales.  
 
----
-
-## Contribuciones
-
-Las contribuciones son bienvenidas. Si deseas agregar nuevas funcionalidades, corregir errores o mejorar la documentación, siéntete libre de enviar [Pull Requests](https://github.com/FiscalAPI/fiscalapi-credentials-net/pulls). Antes de hacerlo, te invitamos a:
-
-1. Revisar las [issues abiertas](https://github.com/FiscalAPI/fiscalapi-credentials-net/issues) para asegurarte de que tu propuesta no esté duplicada.  
-2. Leer nuestro archivo de [CONTRIBUTING](CONTRIBUTING.md) para seguir las pautas del proyecto.  
-3. Consultar el archivo [TODO](TODO.md) y [CHANGELOG](CHANGELOG.md) si están disponibles para conocer pendientes o cambios recientes.
-
----
 
 ## 🤝 Contribuir
 
-1. Haz un **fork** del repositorio.  
-2. Crea una rama para tu feature:  
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```  
-3. Realiza *commits* de tus cambios:  
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```  
-4. Sube tu rama:  
-   ```bash
-   git push origin feature/AmazingFeature
-   ```  
-5. Abre un **Pull Request** en GitHub.
+1. Haz un fork del repositorio.  
+2. Crea una rama para tu feature: `git checkout -b feature/AmazingFeature`.  
+3. Realiza commits de tus cambios: `git commit -m 'Add some AmazingFeature'`.  
+4. Sube tu rama: `git push origin feature/AmazingFeature`.  
+5. Abre un Pull Request en GitHub.
 
----
 
 ## 🐛 Reportar Problemas
 
 1. Asegúrate de usar la última versión del SDK.  
-2. Verifica si el problema ya fue reportado en la sección de [Issues](https://github.com/FiscalAPI/fiscalapi-credentials-net/issues).  
-3. Proporciona un ejemplo mínimo reproducible que ayude a ubicar el error fácilmente.  
-4. Incluye todos los mensajes de error relevantes o capturas de pantalla.
+2. Verifica si el problema ya fue reportado.  
+3. Proporciona un ejemplo mínimo reproducible.  
+4. Incluye los mensajes de error completos.
 
----
 
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la **Licencia MPL**. Consulta el archivo [LICENSE](LICENSE.txt) para más detalles.
+Este proyecto está licenciado bajo la Licencia **MPL**. Consulta el archivo [LICENSE](LICENSE.txt) para más detalles.
 
----
 
 ## 🔗 Enlaces Útiles
 
-- [SDK .NET (fiscalapi-net)](https://github.com/FiscalAPI/fiscalapi-net)  
 - [Documentación Oficial](https://docs.fiscalapi.com)  
 - [Portal de FiscalAPI](https://fiscalapi.com)  
-- [Ejemplos WinForms/Console](https://github.com/FiscalAPI/fiscalapi-samples-net-winforms)  
-- [Ejemplos ASP.NET](https://github.com/FiscalAPI/fiscalapi-samples-net-aspnet)
-
----
-
-¡Gracias por usar **`Credentials`**! Siéntete libre de abrir un *issue* o un *pull request* en caso de dudas o sugerencias.  
-Equipo de **Fiscalapi**.  
-
-
-
-
-
-
-
-
-
-
-## 💡 Soporte
-
-- Correo: soporte@fiscalapi.com
-- [Documentación](https://docs.fiscalapi.com)
-- [GitHub Issues](https://github.com/FiscalAPI/fiscalapi-credentials-net/issues)
+- [Facturar en WinForms/Console](https://github.com/FiscalAPI/fiscalapi-samples-net-winforms)  
+- [Facturar en ASP.NET](https://github.com/FiscalAPI/fiscalapi-samples-net-aspnet)
 
 ---
 
