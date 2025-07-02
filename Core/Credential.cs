@@ -135,15 +135,29 @@ public class Credential : ICredential
     /// <returns>encoded b64 hash</returns>
     public string CreateHash(string input)
     {
+        if (string.IsNullOrEmpty(input))
+            throw new ArgumentException("Input cannot be null or empty", nameof(input));
+
         var inputBytes = Encoding.UTF8.GetBytes(input);
 
-        var hashBytes = CredentialSettings.HashAlgorithm.ComputeHash(inputBytes);
+        using var hashAlgorithm = SHA1.Create();
 
+        var hashBytes = hashAlgorithm.ComputeHash(inputBytes);
         var encodedBytes = hashBytes.ToBase64String();
 
         return encodedBytes;
     }
 
+    //public string CreateHash(string input)
+    //{
+    //    var inputBytes = Encoding.UTF8.GetBytes(input);
+
+    //    var hashBytes = CredentialSettings.HashAlgorithm.ComputeHash(inputBytes);
+
+    //    var encodedBytes = hashBytes.ToBase64String();
+
+    //    return encodedBytes;
+    //}
 
     /// <summary>
     /// Verify a hash against a string.
