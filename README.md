@@ -1,5 +1,7 @@
 # Fiscalapi Credentials
-
+[![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Nuget](https://img.shields.io/nuget/v/Fiscalapi.Credentials)](https://www.nuget.org/packages/Fiscalapi.Credentials)
 [![License](https://img.shields.io/github/license/FiscalAPI/fiscalapi-credentials-net)](https://github.com/FiscalAPI/fiscalapi-credentials-net/blob/main/LICENSE)
 
