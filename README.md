@@ -1,6 +1,8 @@
 # Fiscalapi Credentials
-
-[![NuGet](https://img.shields.io/nuget/v/FiscalApi.svg)](https://www.nuget.org/packages/Fiscalapi.Credentials/)
+[![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![Nuget](https://img.shields.io/nuget/v/Fiscalapi.Credentials)](https://www.nuget.org/packages/Fiscalapi.Credentials)
 [![License](https://img.shields.io/github/license/FiscalAPI/fiscalapi-credentials-net)](https://github.com/FiscalAPI/fiscalapi-credentials-net/blob/main/LICENSE)
 
 Biblioteca para trabajar con archivos **CSD** y **FIEL** del SAT de manera sencilla en .NET. **`Credentials`** simplifica la firma (sellado), la verificación de firmas, el cálculo de hashes (por ejemplo, para servicios de descarga masiva de XML y metadatos), así como la obtención de información relevante de los certificados y llaves públicas del SAT.  
