@@ -38,12 +38,34 @@ namespace Fiscalapi.Credentials.Core
 
 
         /// <summary>
-        /// RFC as parsed from subject/x500UniqueIdentifier 
-        /// see https://oidref.com/2.5.4.45
+        /// RFC as parsed from subject/x500UniqueIdentifier or OID.2.5.4.45
+        /// This ensures cross-platform compatibility (Windows/Linux).
         /// </summary>
         public string Rfc
         {
-            get => SubjectKeyValuePairs.FirstOrDefault(x => x.Key.Equals("OID.2.5.4.45")).Value[..13].Trim();
+            get
+            {
+                // Windows "OID.2.5.4.45"
+                var rfcPair = SubjectKeyValuePairs.FirstOrDefault(x =>
+                    x.Key.Equals("OID.2.5.4.45", StringComparison.OrdinalIgnoreCase));
+
+                // Linux "x500UniqueIdentifier"
+                if (string.IsNullOrEmpty(rfcPair.Value))
+                {
+                    rfcPair = SubjectKeyValuePairs.FirstOrDefault(x =>
+                        x.Key.Equals("x500UniqueIdentifier", StringComparison.OrdinalIgnoreCase));
+                }
+
+                // First 13 chars
+                var value = rfcPair.Value;
+
+                if (!string.IsNullOrEmpty(value) && value.Length >= 12)
+                {
+                    return value[..Math.Min(value.Length, 13)].Trim();
+                }
+
+                throw new Exception("Fiscalapi.Credentials wasn't able to resolve ICertificate.Rfc ");
+            }
         }
 
 
