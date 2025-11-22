@@ -63,15 +63,16 @@ public class PrivateKey : IPrivateKey
     /// Sign some data
     /// </summary>
     /// <param name="toSign">string to be signed</param>
+    /// <param name="algorithm">Hash algorithm to use for signing</param>
+    /// <param name="padding">Signature padding to use</param>
     /// <returns>signed bytes</returns>
-    /// see CredentialSettings class
-    public byte[] SignData(string toSign)
+    public byte[] SignData(string toSign, HashAlgorithmName algorithm, RSASignaturePadding padding)
     {
         //get bytes array to sing
         var bytesToSign = toSign.GetBytes();
 
         //Sing and get signed bytes array
-        var signedBytes = RsaPrivateKey.SignData(bytesToSign, CredentialSettings.SignatureAlgorithm, CredentialSettings.SignaturePadding);
+        var signedBytes = RsaPrivateKey.SignData(bytesToSign, algorithm, padding);
 
         //Converts signed bytes to base64
         return signedBytes;
@@ -82,14 +83,15 @@ public class PrivateKey : IPrivateKey
     /// </summary>
     /// <param name="dataToVerify">original data in bytes</param>
     /// <param name="signedData">signed data in bytes</param>
+    /// <param name="algorithm">Hash algorithm to use for verification</param>
+    /// <param name="padding">Signature padding to use</param>
     /// <returns>True when the signature is valid, otherwise false</returns>
-    public bool VerifyData(byte[] dataToVerify, byte[] signedData)
+    public bool VerifyData(byte[] dataToVerify, byte[] signedData, HashAlgorithmName algorithm, RSASignaturePadding padding)
     {
         try
         {
             //Validation 
-            var isValid = RsaPrivateKey.VerifyData(dataToVerify, signedData, CredentialSettings.SignatureAlgorithm,
-                CredentialSettings.SignaturePadding);
+            var isValid = RsaPrivateKey.VerifyData(dataToVerify, signedData, algorithm, padding);
 
 
             return isValid;

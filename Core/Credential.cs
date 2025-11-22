@@ -28,6 +28,12 @@ public class Credential : ICredential
         PemPrivateKey = privateKey.GetPemRepresentation();
 
         certificateWithPrivateKey = X509Certificate2.CreateFromPem(PemCertificate, PemPrivateKey);
+        
+        // Default algorithm is SHA256 (for invoicing)
+        SignatureAlgorithm = HashAlgorithmName.SHA256;
+        
+        // Default padding is Pkcs1 (used for both invoicing and XML downloader)
+        SignaturePadding = RSASignaturePadding.Pkcs1;
     }
 
     /// <summary>
@@ -49,6 +55,16 @@ public class Credential : ICredential
     public string PemCertificate { get; }
 
     public string PemPrivateKey { get; }
+
+    /// <summary>
+    /// Signature algorithm used for signing data. Default is SHA256 (for invoicing).
+    /// </summary>
+    public HashAlgorithmName SignatureAlgorithm { get; set; }
+
+    /// <summary>
+    /// Signature padding used for signing data. Default is Pkcs1 (used for both invoicing and XML downloader).
+    /// </summary>
+    public RSASignaturePadding SignaturePadding { get; set; }
 
     public byte[] CreatePFX()
     {
@@ -72,11 +88,10 @@ public class Credential : ICredential
     /// </summary>
     /// <param name="toSign">string to be signed</param>
     /// <returns>signed bytes</returns>
-    /// see CredentialSettings class to see signature parameters
     public byte[] SignData(string toSign)
     {
         //Sing and get signed bytes array
-        var signedBytes = PrivateKey.SignData(toSign);
+        var signedBytes = PrivateKey.SignData(toSign, SignatureAlgorithm, SignaturePadding);
 
         return signedBytes;
     }
@@ -89,7 +104,7 @@ public class Credential : ICredential
     /// <returns>True when the signature is valid, otherwise false</returns>
     public bool VerifyData(byte[] dataToVerify, byte[] signedData)
     {
-        var isValid = PrivateKey.VerifyData(dataToVerify, signedData);
+        var isValid = PrivateKey.VerifyData(dataToVerify, signedData, SignatureAlgorithm, SignaturePadding);
 
         return isValid;
     }
@@ -212,19 +227,21 @@ public class Credential : ICredential
 
     /// <summary>
     /// Configure the Signature algorithm to do invoicing, using the donetcfdi/invoicing library.
-    /// The default value is HashAlgorithmName.SHA1 (used for downloading xml), call ConfigureAlgorithmForInvoicing() methost to set HashAlgorithmName.SHA256 when you need to sign invoices. 
+    /// Sets HashAlgorithmName.SHA256 for signing invoices. Returns this for fluent interface.
     /// </summary>
-    public void ConfigureAlgorithmForInvoicing()
+    public ICredential ConfigureAlgorithmForInvoicing()
     {
-        CredentialSettings.SignatureAlgorithm = HashAlgorithmName.SHA256;
+        SignatureAlgorithm = HashAlgorithmName.SHA256;
+        return this;
     }
 
     /// <summary>
     /// Configure the Signature algorithm to do xml-downloader, using the donetcfdi/xml-downloader library.
-    /// The default value is HashAlgorithmName.SHA1 (used for downloading xml), call ConfigureAlgorithmForXmlDownloader() method to set HashAlgorithmName.SHA1 when you need to download xml. 
+    /// Sets HashAlgorithmName.SHA1 for downloading xml. Returns this for fluent interface.
     /// </summary>
-    public void ConfigureAlgorithmForXmlDownloader()
+    public ICredential ConfigureAlgorithmForXmlDownloader()
     {
-        CredentialSettings.SignatureAlgorithm = HashAlgorithmName.SHA1;
+        SignatureAlgorithm = HashAlgorithmName.SHA1;
+        return this;
     }
 }

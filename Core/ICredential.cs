@@ -1,4 +1,5 @@
-﻿using Fiscalapi.Credentials.Common;
+﻿using System.Security.Cryptography;
+using Fiscalapi.Credentials.Common;
 
 namespace Fiscalapi.Credentials.Core;
 
@@ -26,6 +27,16 @@ public interface ICredential
     /// Fiel whe credential.certificate is a FIEL certificate otherwise csd
     /// </summary>
     CredentialType CredentialType { get; }
+
+    /// <summary>
+    /// Signature algorithm used for signing data. Default is SHA256 (for invoicing).
+    /// </summary>
+    HashAlgorithmName SignatureAlgorithm { get; set; }
+
+    /// <summary>
+    /// Signature padding used for signing data. Default is Pkcs1 (used for both invoicing and XML downloader).
+    /// </summary>
+    RSASignaturePadding SignaturePadding { get; set; }
 
     byte[] CreatePFX();
 
@@ -87,13 +98,13 @@ public interface ICredential
 
     /// <summary>
     /// Configure the Signature algorithm to do invoicing, using the donetcfdi/invoicing library.
-    /// The default value is HashAlgorithmName.SHA1 (used for downloading xml), call ConfigureAlgorithmForInvoicing() methost to set HashAlgorithmName.SHA256 when you need to sign invoices. 
+    /// Sets HashAlgorithmName.SHA256 for signing invoices. Returns this for fluent interface.
     /// </summary>
-    public void ConfigureAlgorithmForInvoicing();
+    public ICredential ConfigureAlgorithmForInvoicing();
 
     /// <summary>
     /// Configure the Signature algorithm to do xml-downloader, using the donetcfdi/xml-downloader library.
-    /// The default value is HashAlgorithmName.SHA1 (used for downloading xml), call ConfigureAlgorithmForXmlDownloader() method to set HashAlgorithmName.SHA1 when you need to download xml. 
+    /// Sets HashAlgorithmName.SHA1 for downloading xml. Returns this for fluent interface.
     /// </summary>
-    public void ConfigureAlgorithmForXmlDownloader();
+    public ICredential ConfigureAlgorithmForXmlDownloader();
 }

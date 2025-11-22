@@ -42,15 +42,18 @@ public interface IPrivateKey
     /// Sign some data
     /// </summary>
     /// <param name="toSign">string to be signed</param>
+    /// <param name="algorithm">Hash algorithm to use for signing</param>
+    /// <param name="padding">Signature padding to use</param>
     /// <returns>signed bytes</returns>
-    /// see CredentialSettings class
-    byte[] SignData(string toSign);
+    byte[] SignData(string toSign, HashAlgorithmName algorithm, RSASignaturePadding padding);
 
     /// <summary>
     /// Verify the signature of some data
     /// </summary>
     /// <param name="dataToVerify">original data in bytes</param>
     /// <param name="signedData">signed data in bytes</param>
+    /// <param name="algorithm">Hash algorithm to use for verification</param>
+    /// <param name="padding">Signature padding to use</param>
     /// <returns>True when the signature is valid, otherwise false</returns>
-    bool VerifyData(byte[] dataToVerify, byte[] signedData);
+    bool VerifyData(byte[] dataToVerify, byte[] signedData, HashAlgorithmName algorithm, RSASignaturePadding padding);
 }
