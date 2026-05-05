@@ -132,7 +132,10 @@ namespace Fiscalapi.Credentials.Core
         public List<KeyValuePair<string, string>> IssuerKeyValuePairs
         {
             get => _x509Certificate2.Issuer.Split(',')
-                .Select(x => new KeyValuePair<string, string>(x.Split('=')[0].Trim(), x.Split('=')[1].Trim())).ToList();
+                 .Select(x => x.Split('=', 2))
+                 .Where(parts => parts.Length == 2)
+                 .Select(parts => new KeyValuePair<string, string>(parts[0].Trim(), parts[1].Trim()))
+                 .ToList();
         }
 
         /// <summary>
@@ -151,7 +154,10 @@ namespace Fiscalapi.Credentials.Core
         public List<KeyValuePair<string, string>> SubjectKeyValuePairs
         {
             get => _x509Certificate2.Subject.Split(',')
-                .Select(x => new KeyValuePair<string, string>(x.Split('=')[0].Trim(), x.Split('=')[1].Trim())).ToList();
+                 .Select(x => x.Split('=', 2))
+                 .Where(parts => parts.Length == 2)
+                 .Select(parts => new KeyValuePair<string, string>(parts[0].Trim(), parts[1].Trim()))
+                 .ToList();
         }
 
         /// <summary>
