@@ -215,7 +215,7 @@ public class Credential : ICredential
         var xsltSettings = new XsltSettings
         {
             EnableDocumentFunction = true,
-            EnableScript = true
+            //EnableScript = true
         };
         var resolver = new XmlUrlResolver();
         var transformer = new XslCompiledTransform();

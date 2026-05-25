@@ -1,7 +1,7 @@
 # Fiscalapi Credentials
-[![.NET](https://img.shields.io/badge/.NET-6.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/6.0)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/8.0)
 [![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
+[![.NET](https://img.shields.io/badge/.NET-10.0-purple.svg)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![Nuget](https://img.shields.io/nuget/v/Fiscalapi.Credentials)](https://www.nuget.org/packages/Fiscalapi.Credentials)
 [![License](https://img.shields.io/github/license/FiscalAPI/fiscalapi-credentials-net)](https://github.com/FiscalAPI/fiscalapi-credentials-net/blob/main/LICENSE)
 
@@ -159,7 +159,7 @@ Por lo tanto, no necesitas realizar la conversión manual ni depender de utiler�
 
 ## Compatibilidad
 
-- Compatible con **.NET 6**, **.NET 8** y **.NET 9**  WinForms, WPF, Console, ASP.NET, Blazor, MVC, WebApi.   
+- Compatible con **.NET 8**, **.NET 9** y **.NET 10**  WinForms, WPF, Console, ASP.NET, Blazor, MVC, WebApi.   
 - Mantenemos la compatibilidad con al menos la versión LTS más reciente de .NET.  
 - Se sigue el [**Versionado Semántico 2.0.0**]([docs/SEMVER.md](https://learn.microsoft.com/en-us/nuget/concepts/package-versioning?tabs=semver20sort)), por lo que puedes confiar en que las versiones nuevas no romperán tu aplicación de forma inesperada.
 ## Roadmap
