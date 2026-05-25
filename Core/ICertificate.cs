@@ -1,28 +1,31 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Fiscalapi.Credentials.Core;
 
+/// <summary>
+/// Read-only view of a SAT cryptographic certificate (FIEL/e.firma or CSD).
+/// </summary>
 public interface ICertificate
 {
     /// <summary>
-    /// The result of reading the bytes from the .cer file and converting them to base64
+    /// The .cer file bytes encoded as base64. Preserved so the credential can be round-tripped through storage.
     /// </summary>
     string PlainBase64 { get; }
 
     /// <summary>
-    /// The equivalent of reading the bytes from the .cer file and converting them to base64
+    /// Decoded bytes of the .cer file (Convert.FromBase64String of PlainBase64).
     /// </summary>
     byte[] CertificatePlainBytes { get; }
 
     /// <summary>
-    /// RFC as parsed from subject/x500UniqueIdentifier 
-    /// see https://oidref.com/2.5.4.45
+    /// RFC of the certificate holder, parsed from the subject's x500UniqueIdentifier (OID.2.5.4.45).
     /// </summary>
     string Rfc { get; }
 
     /// <summary>
-    /// Organization = 'razón social'
+    /// Razón social of the certificate holder (OID.2.5.4.41 with fallback to "O").
     /// </summary>
     string Organization
     {
@@ -36,8 +39,7 @@ public interface ICertificate
     }
 
     /// <summary>
-    /// OrganizationalUnit = 'Sucursal'
-    /// As of 2019-08-01 is known that only CSD have OU (Organization Unit)
+    /// OrganizationalUnit ("Sucursal"). As of 2019-08-01 only CSDs have OU; FIEL certificates do not.
     /// </summary>
     string OrganizationalUnit
     {
@@ -47,80 +49,82 @@ public interface ICertificate
         // L: Locality
         // S: StateOrProvinceName
         // C: CountryName
-
         get;
     }
 
     /// <summary>
-    /// All serial number
+    /// Big-endian hexadecimal serial number reported by X509Certificate2.SerialNumber.
     /// </summary>
     string SerialNumber { get; }
 
     /// <summary>
-    /// Certificate number as Mexican tax authority (SAT) require.
+    /// 20-digit ASCII "noCertificado" required by the SAT in CFDI sealing.
     /// </summary>
     string CertificateNumber { get; }
 
     /// <summary>
-    /// Issuer data parsed into KeyValuePair collection
+    /// Issuer DN parsed into key/value pairs (key is Oid.FriendlyName when available, otherwise "OID.&lt;value&gt;").
     /// </summary>
     List<KeyValuePair<string, string>> IssuerKeyValuePairs { get; }
 
     /// <summary>
-    /// Raw X509Certificate2 Issuer property
+    /// Issuer DN as a single string (X509Certificate2.Issuer).
     /// </summary>
     string Issuer { get; }
 
     /// <summary>
-    /// Subject data parsed into KeyValuePair collection
-    /// see https://oidref.com/2.5.4.45
+    /// Subject DN parsed into key/value pairs (key is Oid.FriendlyName when available, otherwise "OID.&lt;value&gt;").
     /// </summary>
     List<KeyValuePair<string, string>> SubjectKeyValuePairs { get; }
 
     /// <summary>
-    /// Raw X509Certificate2 Subject property
-    /// see https://oidref.com/2.5.4.45
+    /// Subject DN as a single string (X509Certificate2.Subject).
     /// </summary>
     string Subject { get; }
 
     /// <summary>
-    /// Certificate version
+    /// X.509 format version (typically 3 for SAT-issued certificates).
     /// </summary>
     int Version { get; }
 
     /// <summary>
-    /// Valid start date
+    /// NotBefore (certificate effective date) in local time.
     /// </summary>
     DateTime ValidFrom { get; }
 
     /// <summary>
-    /// Valid end date
+    /// NotAfter (certificate expiration date) in local time.
     /// </summary>
     DateTime ValidTo { get; }
 
     /// <summary>
-    /// Raw Data Length
+    /// Length in bytes of the raw DER-encoded certificate.
     /// </summary>
     int RawDataLength { get; }
 
     /// <summary>
-    /// RawDataBytes
+    /// Raw DER-encoded certificate bytes.
     /// </summary>
     byte[] RawDataBytes { get; }
 
     /// <summary>
-    /// True if ValidTo date is less than the current date
+    /// True when ValidTo is in the future (compared against DateTime.Now).
     /// </summary>
     bool IsValid();
 
     /// <summary>
-    /// True when is a FIEL certificate
+    /// True when the certificate is a FIEL/e.firma, identified by the absence of an OrganizationalUnit.
     /// </summary>
     bool IsFiel();
 
     /// <summary>
-    /// Convert X.509 DER base64 or X.509 DER to X.509 PEM
+    /// Converts the X.509 DER (or its base64 form) to X.509 PEM.
     /// </summary>
-    /// <returns></returns>
     string GetPemRepresentation();
+
+    /// <summary>
+    /// True when this certificate and the given RSA private key form a matching pair
+    /// (compares the modulus and exponent of the public keys).
+    /// </summary>
+    bool ArePaired(RSA privateKey);
 }

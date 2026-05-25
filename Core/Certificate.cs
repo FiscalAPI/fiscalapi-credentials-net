@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,13 +9,15 @@ using Fiscalapi.Credentials.Common;
 namespace Fiscalapi.Credentials.Core
 {
     /// <summary>
-    /// Represents a wrapper for FIEL and CSD certificate.
+    /// Wrapper for a SAT cryptographic certificate (FIEL/e.firma or CSD).
     /// </summary>
     public sealed class Certificate : ICertificate
     {
         private readonly X509Certificate2 _x509Certificate2;
 
-
+        /// <summary>
+        /// Initializes the certificate from the .cer file bytes encoded as base64.
+        /// </summary>
         public Certificate(string plainBase64)
         {
             PlainBase64 = plainBase64;
@@ -23,40 +25,35 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// The result of reading the bytes from the .cer file and converting them to base64
+        /// The .cer file bytes encoded as base64. Preserved so the credential can be round-tripped through storage.
         /// </summary>
         public string PlainBase64 { get; }
 
-
         /// <summary>
-        /// The equivalent of reading the bytes from the .cer file and converting them to base64
+        /// Decoded bytes of the .cer file (Convert.FromBase64String of PlainBase64).
         /// </summary>
         public byte[] CertificatePlainBytes
         {
             get => Convert.FromBase64String(PlainBase64);
         }
 
-
         /// <summary>
-        /// RFC as parsed from subject/x500UniqueIdentifier or OID.2.5.4.45
-        /// This ensures cross-platform compatibility (Windows/Linux).
+        /// RFC of the certificate holder, parsed from the subject's x500UniqueIdentifier (OID.2.5.4.45).
+        /// Cross-platform: Windows reports the key as "OID.2.5.4.45", Linux as "x500UniqueIdentifier".
         /// </summary>
         public string Rfc
         {
             get
             {
-                // Windows "OID.2.5.4.45"
                 var rfcPair = SubjectKeyValuePairs.FirstOrDefault(x =>
                     x.Key.Equals("OID.2.5.4.45", StringComparison.OrdinalIgnoreCase));
 
-                // Linux "x500UniqueIdentifier"
                 if (string.IsNullOrEmpty(rfcPair.Value))
                 {
                     rfcPair = SubjectKeyValuePairs.FirstOrDefault(x =>
                         x.Key.Equals("x500UniqueIdentifier", StringComparison.OrdinalIgnoreCase));
                 }
 
-                // First 13 chars
                 var value = rfcPair.Value;
 
                 if (!string.IsNullOrEmpty(value) && value.Length >= 12)
@@ -68,36 +65,33 @@ namespace Fiscalapi.Credentials.Core
             }
         }
 
-
         /// <summary>
-        /// Organization = 'razón social'
+        /// Razón social of the certificate holder, parsed from OID.2.5.4.41 ("name") with fallback to "O" (organizationName, OID.2.5.4.10).
+        /// Cross-platform: Windows reports the key as "OID.2.5.4.41", Linux as "name".
         /// </summary>
         public string Organization
         {
-            // CN: CommonName
-            // OU: OrganizationalUnit
-            // O: Organization
-            // L: Locality
-            // S: StateOrProvinceName
-            // C: CountryName
-            get => ExistsKey(SubjectKeyValuePairs, "O")
-                ? SubjectKeyValuePairs.FirstOrDefault(x => x.Key.Equals("O")).Value.Trim()
-                : string.Empty;
+            get
+            {
+                var pair = SubjectKeyValuePairs.FirstOrDefault(x =>
+                    x.Key.Equals("OID.2.5.4.41", StringComparison.OrdinalIgnoreCase) ||
+                    x.Key.Equals("name", StringComparison.OrdinalIgnoreCase));
+
+                if (string.IsNullOrEmpty(pair.Value))
+                {
+                    pair = SubjectKeyValuePairs.FirstOrDefault(x =>
+                        x.Key.Equals("O", StringComparison.OrdinalIgnoreCase));
+                }
+
+                return pair.Value?.Trim() ?? string.Empty;
+            }
         }
 
         /// <summary>
-        /// OrganizationalUnit = 'Sucursal'
-        /// As of 2019-08-01 is known that only CSD have OU (Organization Unit)
+        /// OrganizationalUnit ("Sucursal"). As of 2019-08-01 only CSDs have OU; FIEL certificates do not.
         /// </summary>
         public string OrganizationalUnit
         {
-            // CN: CommonName
-            // OU: OrganizationalUnit
-            // O: Organization
-            // L: Locality
-            // S: StateOrProvinceName
-            // C: CountryName
-
             get => ExistsKey(SubjectKeyValuePairs, "OU")
                 ? SubjectKeyValuePairs.FirstOrDefault(x => x.Key.Equals("OU")).Value.Trim()
                 : string.Empty;
@@ -108,9 +102,8 @@ namespace Fiscalapi.Credentials.Core
             return keyValuePairs.Any(pair => pair.Key.Equals(key));
         }
 
-
         /// <summary>
-        /// All serial number
+        /// Big-endian hexadecimal serial number reported by X509Certificate2.SerialNumber.
         /// </summary>
         public string SerialNumber
         {
@@ -118,54 +111,77 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// Certificate number as Mexican tax authority (SAT) require.
+        /// 20-digit ASCII "noCertificado" required by the SAT in CFDI sealing
+        /// (raw serial bytes reversed to little-endian and decoded as ASCII).
         /// </summary>
         public string CertificateNumber
         {
             get => Encoding.ASCII.GetString(_x509Certificate2.GetSerialNumber().Reverse().ToArray());
         }
 
-
         /// <summary>
-        /// Issuer data parsed into KeyValuePair collection
+        /// Issuer DN parsed into key/value pairs (key is Oid.FriendlyName when available, otherwise "OID.&lt;value&gt;").
         /// </summary>
         public List<KeyValuePair<string, string>> IssuerKeyValuePairs
         {
-            get => _x509Certificate2.Issuer.Split(',')
-                .Select(x => new KeyValuePair<string, string>(x.Split('=')[0].Trim(), x.Split('=')[1].Trim())).ToList();
+            get => ParseDistinguishedName(_x509Certificate2.IssuerName);
         }
 
         /// <summary>
-        /// Raw X509Certificate2 Issuer property
+        /// Issuer DN as a single string (X509Certificate2.Issuer).
         /// </summary>
         public string Issuer
         {
             get => _x509Certificate2.Issuer;
         }
 
-
         /// <summary>
-        /// Subject data parsed into KeyValuePair collection
-        /// see https://oidref.com/2.5.4.45
+        /// Subject DN parsed into key/value pairs (key is Oid.FriendlyName when available, otherwise "OID.&lt;value&gt;").
         /// </summary>
         public List<KeyValuePair<string, string>> SubjectKeyValuePairs
         {
-            get => _x509Certificate2.Subject.Split(',')
-                .Select(x => new KeyValuePair<string, string>(x.Split('=')[0].Trim(), x.Split('=')[1].Trim())).ToList();
+            get => ParseDistinguishedName(_x509Certificate2.SubjectName);
         }
 
         /// <summary>
-        /// Raw X509Certificate2 Subject property
-        /// see https://oidref.com/2.5.4.45
+        /// Parses an X.500 distinguished name into key/value pairs, honoring RFC 2253 escaping
+        /// (avoids the IndexOutOfRangeException that string.Split(',') hits on values with literal commas).
+        /// </summary>
+        private static List<KeyValuePair<string, string>> ParseDistinguishedName(X500DistinguishedName dn)
+        {
+            var result = new List<KeyValuePair<string, string>>();
+
+            foreach (var rdn in dn.EnumerateRelativeDistinguishedNames())
+            {
+                if (rdn.HasMultipleElements)
+                    continue;
+
+                var oid = rdn.GetSingleElementType();
+                var value = rdn.GetSingleElementValue();
+
+                if (value is null)
+                    continue;
+
+                var key = !string.IsNullOrEmpty(oid.FriendlyName)
+                    ? oid.FriendlyName
+                    : $"OID.{oid.Value}";
+
+                result.Add(new KeyValuePair<string, string>(key, value));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Subject DN as a single string (X509Certificate2.Subject).
         /// </summary>
         public string Subject
         {
             get => _x509Certificate2.Subject;
         }
 
-
         /// <summary>
-        /// Certificate version
+        /// X.509 format version (typically 3 for SAT-issued certificates).
         /// </summary>
         public int Version
         {
@@ -173,7 +189,7 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// Valid start date
+        /// NotBefore (certificate effective date) in local time.
         /// </summary>
         public DateTime ValidFrom
         {
@@ -181,7 +197,7 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// Valid end date
+        /// NotAfter (certificate expiration date) in local time.
         /// </summary>
         public DateTime ValidTo
         {
@@ -189,7 +205,7 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// True if ValidTo date is less than the current date
+        /// True when ValidTo is in the future (compared against DateTime.Now).
         /// </summary>
         public bool IsValid()
         {
@@ -197,16 +213,15 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// True when is a FIEL certificate
+        /// True when the certificate is a FIEL/e.firma, identified by the absence of an OrganizationalUnit.
         /// </summary>
         public bool IsFiel()
         {
             return string.IsNullOrEmpty(OrganizationalUnit);
         }
 
-
         /// <summary>
-        /// Raw Data Length
+        /// Length in bytes of the raw DER-encoded certificate.
         /// </summary>
         public int RawDataLength
         {
@@ -214,7 +229,7 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// RawDataBytes
+        /// Raw DER-encoded certificate bytes.
         /// </summary>
         public byte[] RawDataBytes
         {
@@ -222,14 +237,40 @@ namespace Fiscalapi.Credentials.Core
         }
 
         /// <summary>
-        /// Convert X.509 DER base64 or X.509 DER to X.509 PEM
+        /// Converts the X.509 DER (or its base64 form) to X.509 PEM.
         /// </summary>
-        /// <returns></returns>
         public string GetPemRepresentation()
         {
             var certPem = new string(PemEncoding.Write(Flags.PemCertificate, _x509Certificate2.RawData));
 
             return certPem;
+        }
+
+        /// <summary>
+        /// True when this certificate and the given RSA private key form a matching pair
+        /// (compares the modulus and exponent of the public keys).
+        /// </summary>
+        public bool ArePaired(RSA privateKey)
+        {
+            if (privateKey is null)
+                return false;
+
+            try
+            {
+                using var certificatePublicKey = _x509Certificate2.GetRSAPublicKey();
+                if (certificatePublicKey is null)
+                    return false;
+
+                var certParams = certificatePublicKey.ExportParameters(includePrivateParameters: false);
+                var keyParams = privateKey.ExportParameters(includePrivateParameters: false);
+
+                return certParams.Modulus.AsSpan().SequenceEqual(keyParams.Modulus)
+                    && certParams.Exponent.AsSpan().SequenceEqual(keyParams.Exponent);
+            }
+            catch (CryptographicException)
+            {
+                return false;
+            }
         }
     }
 }
