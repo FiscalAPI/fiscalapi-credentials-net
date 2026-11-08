@@ -16,7 +16,7 @@ dotnet build --configuration Release           # also emits the .nupkg (Generate
 dotnet pack  --configuration Release --output ./nupkg
 ```
 
-Publishing is handled by `.github/workflows/CICD.yml` (manual `workflow_dispatch`), which reads the version from the csproj and pushes to nuget.org using the `NUGET_KEY` secret.
+Publishing is handled by `.github/workflows/CICD.yml` (manual `workflow_dispatch`), which reads the version from the csproj and pushes to nuget.org with Trusted Publishing (OIDC via `NuGet/login`, no API key secret).
 
 There is **no test project** in the solution — do not claim tests pass; there is nothing to run. If you add tests, add a new test project to `fiscalapi-credentials.sln`.
 
